@@ -1,0 +1,77 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div id="box"></div>
+
+
+    <script type="text/template" id="tpl">
+        过滤器的使用方式
+        <br>
+        { {birthday | 过滤器名称} }
+        <br>
+        过滤器其实就是一个函数  
+        <br>
+        上面的使用方式，其实就是在调用这个函数，把|前面写的数据当做参数传递给这个函数了，最终将函数的返回值显示出来
+        <br>
+        {{birthday | utcdate}}
+
+
+        <br>
+
+        {{birthday | adddays 5 | utcdate}}
+    </script>
+
+
+    <script src="template-web.js"></script>
+
+    <script>
+        var obj = {
+            name: "张三",
+            birthday: new Date("2000-11-10")
+        }
+
+        // template.defaults.imports.过滤器名称 = function(date){
+        //     //过滤器的内容
+        //     //一定要注意 需要一个返回值
+        // };
+
+        template.defaults.imports.gmtdate = function(value){
+            return value.toGMTString();
+        }
+
+        template.defaults.imports.utcdate = function(value){
+            return value.toUTCString();
+        }
+
+        template.defaults.imports.adddays = function(value, d){
+            var dayNumber = new Date(value.getYear(), value.getMonth() + 1, 0).getDate(); //当月天数
+            var Year = value.getFullYear();  //当前年
+            var Month = value.getMonth() + 1; //当前月
+            var Day = value.getDate(); //当前日
+            for (var i = 0; i < d; i++) {
+                Day++;
+                if (Day > dayNumber) {
+                    Day = 1;
+                    Month++;
+                    if (Month > 12) {
+                        Month = 1;
+                        Year++;
+                    }
+                }
+            }
+            return new Date(Year, Month - 1, Day);
+        }
+
+        var html = template("tpl", obj);
+
+        document.querySelector("#box").innerHTML = html;
+    </script>
+</body>
+</html>
